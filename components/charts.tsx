@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+  LineChart, Line, XAxis, YAxis, Tooltip, Legend,
   ResponsiveContainer, ComposedChart, Area,
 } from "recharts";
 
@@ -84,10 +84,9 @@ export function RankLinesChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data} margin={{ top: 8, right: endLabel ? 36 : 8, bottom: 4, left: 0 }}>
-        <CartesianGrid stroke="var(--grid)" vertical={false} />
         <XAxis dataKey="date" tick={AXIS} tickLine={false} axisLine={{ stroke: "var(--baseline)" }} minTickGap={40} />
-        <YAxis reversed tick={AXIS} tickLine={false} axisLine={false} width={44} domain={[1, "dataMax"]}
-          allowDataOverflow tickFormatter={(v: number) => `#${v}`} />
+        {/* ranks live in the hover tooltip; no axis numbers, no gridlines */}
+        <YAxis reversed hide domain={[1, "dataMax"]} allowDataOverflow />
         <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "var(--text-secondary)" }} />
         {seriesKeys.length > 1 && <Legend wrapperStyle={{ fontSize: 12 }} />}
         {seriesKeys.map((k, i) => (
@@ -112,7 +111,6 @@ export function RevenueBandChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
-        <CartesianGrid stroke="var(--grid)" vertical={false} />
         <XAxis dataKey="date" tick={AXIS} tickLine={false} axisLine={{ stroke: "var(--baseline)" }} minTickGap={40} />
         <YAxis tick={AXIS} tickLine={false} axisLine={false} width={52}
           tickFormatter={(v: number) => (v >= 1000 ? `$${Math.round(v / 1000)}k` : `$${v}`)} />
@@ -146,7 +144,6 @@ export function CountChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data} margin={{ top: 8, right: endLabel ? 36 : 8, bottom: 4, left: 0 }}>
-        <CartesianGrid stroke="var(--grid)" vertical={false} />
         <XAxis dataKey="date" tick={AXIS} tickLine={false} axisLine={{ stroke: "var(--baseline)" }} minTickGap={40} />
         <YAxis tick={AXIS} tickLine={false} axisLine={false} width={44} />
         <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "var(--text-secondary)" }} />
