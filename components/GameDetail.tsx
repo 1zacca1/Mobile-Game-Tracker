@@ -120,7 +120,7 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
 
       <ChartCard
         title="Top-grossing rank by country"
-        note="REAL store data. Inverted axis: up = better. iOS = all-apps top-100 (Apple RSS); Android = games top-200. Stores are shown separately — never merged."
+        note="REAL store data. Inverted axis: up = better. Games charts on both stores (iOS via the App Store charts endpoint, Android top-200). Stores are shown separately — never merged."
         csv={storeSplitCsv(store, grossingIos.data, grossingAndroid.data)}
         filename={`${game.name}_grossing.csv`}>
         <StoreSplitRanks store={store} ios={grossingIos} android={grossingAndroid} />
@@ -138,7 +138,8 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
         title="Review velocity (Δ reviews/day) by country"
         note={`PROXY for downloads: day-over-day change in cumulative review/rating counts. ${store === "both" ? "iOS + Google Play summed per country (velocity is additive, unlike ranks)." : store === "ios" ? "iOS only (iTunes lookup)." : "Google Play only."} Needs at least two collection days to show anything.`}
         csv={velocity.data} filename={`${game.name}_review_velocity.csv`}>
-        <CountChart data={velocity.data} seriesKeys={velocity.keys} colorFor={(k) => countryColor(k)} />
+        <CountChart data={velocity.data} seriesKeys={velocity.keys} colorFor={(k) => countryColor(k)}
+          endLabel={(k) => k.toUpperCase()} />
         <CountryLegendNote keys={velocity.keys} />
       </ChartCard>
 
@@ -220,12 +221,12 @@ function storeSplitCsv(
 
 // "Both" renders two stacked charts — one per store — rather than merging ranks.
 function StoreSplitRanks({ store, ios, android }: { store: StoreFilter; ios: Pivot; android: Pivot }) {
-  if (store === "ios") return <StoreBlock label={null} pivot={ios} emptyNote="No iOS chart ranks recorded (outside the all-apps top-100 in these markets, or no App Store ID set)." />;
+  if (store === "ios") return <StoreBlock label={null} pivot={ios} emptyNote="No iOS chart ranks recorded (outside the games charts in these markets, or no App Store ID set)." />;
   if (store === "android") return <StoreBlock label={null} pivot={android} emptyNote="No Google Play chart ranks recorded (outside the games top-200 in these markets, or no Play package set)." />;
   return (
     <div className="space-y-3">
-      <StoreBlock label="iOS — App Store (all-apps top-100)" pivot={ios}
-        emptyNote="No iOS chart ranks recorded (outside the all-apps top-100 in these markets, or no App Store ID set)." />
+      <StoreBlock label="iOS — App Store (games top-200)" pivot={ios}
+        emptyNote="No iOS chart ranks recorded (outside the games charts in these markets, or no App Store ID set)." />
       <StoreBlock label="Google Play (games top-200)" pivot={android}
         emptyNote="No Google Play chart ranks recorded (outside the games top-200 in these markets, or no Play package set)." />
     </div>
@@ -242,7 +243,8 @@ function StoreBlock({ label, pivot, emptyNote }: { label: string | null; pivot: 
         </div>
       ) : (
         <>
-          <RankLinesChart data={pivot.data} seriesKeys={pivot.keys} colorFor={(k) => countryColor(k)} height={220} />
+          <RankLinesChart data={pivot.data} seriesKeys={pivot.keys} colorFor={(k) => countryColor(k)}
+            height={220} endLabel={(k) => k.toUpperCase()} />
           <CountryLegendNote keys={pivot.keys} />
         </>
       )}

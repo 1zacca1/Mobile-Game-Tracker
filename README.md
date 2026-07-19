@@ -14,7 +14,7 @@ builds its own historical dataset from day one.
 
 | Series | Nature | Source |
 |---|---|---|
-| Free / grossing chart ranks | **Real** | Apple marketing-tools RSS (top-100, all apps) · Google Play top-200 games via `google-play-scraper` |
+| Free / grossing chart ranks | **Real** | App Store charts endpoint (games top-200; Apple's RSS no longer carries grossing) · Google Play top-200 games via `google-play-scraper` |
 | Review counts / ratings | **Real** (cumulative) | iTunes lookup API · Google Play app pages |
 | Review velocity (Δ reviews/day) | **Proxy for downloads** | derived day-over-day from the above |
 | Install brackets (Android) | **Real but coarse** ("100,000,000+") | Google Play |
@@ -91,8 +91,9 @@ Behavior by anchor count, shown in the UI next to every estimate:
   [0.3, 1.5]); band from residual spread, floored at ±35%.
 
 More anchors, spread across the rank range (one top-10, one ~50, one ~150), tighten
-the fit materially. iOS grossing rank here is Apple's **all-apps top-100**, so
-calibrate iOS anchors against all-apps ranks.
+the fit materially. Both stores' grossing ranks here are **games-chart** ranks
+(iOS top-200 games via the App Store charts endpoint, Android top-200 games), so
+calibrate anchors against games-chart positions.
 
 ## Pages
 
