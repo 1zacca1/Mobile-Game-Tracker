@@ -26,23 +26,17 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
 
   const storeMatch = (s: string) => store === "both" || s === store;
 
-  // grossing / free rank pivots: best (min) rank across included stores
-  const rankPivot = (chart: string) => {
-    const best = new Map<string, number>();
-    for (const r of ranks) {
-      if (r.chart !== chart || !storeMatch(r.store)) continue;
-      const k = `${r.date}|${r.country}`;
-      best.set(k, Math.min(best.get(k) ?? Infinity, r.rank));
-    }
-    return pivotByCountry(
-      [...best.entries()].map(([k, v]) => {
-        const [date, country] = k.split("|");
-        return { date, country, value: v };
-      }),
+  // rank pivots are always per store — iOS and Android charts are never merged
+  const rankPivotFor = (chart: string, st: "ios" | "android") =>
+    pivotByCountry(
+      ranks
+        .filter((r) => r.chart === chart && r.store === st)
+        .map((r) => ({ date: r.date, country: r.country, value: r.rank })),
     );
-  };
-  const grossing = useMemo(() => rankPivot("grossing"), [ranks, store]); // eslint-disable-line react-hooks/exhaustive-deps
-  const free = useMemo(() => rankPivot("free"), [ranks, store]); // eslint-disable-line react-hooks/exhaustive-deps
+  const grossingIos = useMemo(() => rankPivotFor("grossing", "ios"), [ranks]); // eslint-disable-line react-hooks/exhaustive-deps
+  const grossingAndroid = useMemo(() => rankPivotFor("grossing", "android"), [ranks]); // eslint-disable-line react-hooks/exhaustive-deps
+  const freeIos = useMemo(() => rankPivotFor("free", "ios"), [ranks]); // eslint-disable-line react-hooks/exhaustive-deps
+  const freeAndroid = useMemo(() => rankPivotFor("free", "android"), [ranks]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // review velocity: day-over-day delta per (store, country), summed across stores
   const velocity = useMemo(() => {
@@ -126,23 +120,23 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
 
       <ChartCard
         title="Top-grossing rank by country"
-        note="REAL store data. Inverted axis: up = better. iOS = all-apps top-100 (Apple RSS); Android = games top-200."
-        csv={grossing.data} filename={`${game.name}_grossing.csv`}>
-        <RankLinesChart data={grossing.data} seriesKeys={grossing.keys} colorFor={(k) => countryColor(k)} />
-        <CountryLegendNote keys={grossing.keys} />
+        note="REAL store data. Inverted axis: up = better. iOS = all-apps top-100 (Apple RSS); Android = games top-200. Stores are shown separately — never merged."
+        csv={storeSplitCsv(store, grossingIos.data, grossingAndroid.data)}
+        filename={`${game.name}_grossing.csv`}>
+        <StoreSplitRanks store={store} ios={grossingIos} android={grossingAndroid} />
       </ChartCard>
 
       <ChartCard
         title="Top-free rank by country"
         note="REAL store data. Presence in free charts tracks download momentum."
-        csv={free.data} filename={`${game.name}_free.csv`}>
-        <RankLinesChart data={free.data} seriesKeys={free.keys} colorFor={(k) => countryColor(k)} />
-        <CountryLegendNote keys={free.keys} />
+        csv={storeSplitCsv(store, freeIos.data, freeAndroid.data)}
+        filename={`${game.name}_free.csv`}>
+        <StoreSplitRanks store={store} ios={freeIos} android={freeAndroid} />
       </ChartCard>
 
       <ChartCard
         title="Review velocity (Δ reviews/day) by country"
-        note="PROXY for downloads: day-over-day change in cumulative review/rating counts (iTunes lookup + Google Play)."
+        note={`PROXY for downloads: day-over-day change in cumulative review/rating counts. ${store === "both" ? "iOS + Google Play summed per country (velocity is additive, unlike ranks)." : store === "ios" ? "iOS only (iTunes lookup)." : "Google Play only."} Needs at least two collection days to show anything.`}
         csv={velocity.data} filename={`${game.name}_review_velocity.csv`}>
         <CountChart data={velocity.data} seriesKeys={velocity.keys} colorFor={(k) => countryColor(k)} />
         <CountryLegendNote keys={velocity.keys} />
@@ -206,6 +200,53 @@ function ChartCard({ title, note, children, csv, filename }: {
       {children}
       <p className="mt-2 text-[11px] leading-snug text-[var(--text-muted)]">{note}</p>
     </section>
+  );
+}
+
+type Pivot = { data: Record<string, string | number | null>[]; keys: string[] };
+
+// CSV rows carry an explicit store column so exported data is never ambiguous.
+function storeSplitCsv(
+  store: StoreFilter,
+  ios: Record<string, string | number | null>[],
+  android: Record<string, string | number | null>[],
+): Record<string, unknown>[] {
+  const tag = (rows: Record<string, string | number | null>[], s: string) =>
+    rows.map((r) => ({ store: s, ...r }));
+  if (store === "ios") return tag(ios, "ios");
+  if (store === "android") return tag(android, "android");
+  return [...tag(ios, "ios"), ...tag(android, "android")];
+}
+
+// "Both" renders two stacked charts — one per store — rather than merging ranks.
+function StoreSplitRanks({ store, ios, android }: { store: StoreFilter; ios: Pivot; android: Pivot }) {
+  if (store === "ios") return <StoreBlock label={null} pivot={ios} emptyNote="No iOS chart ranks recorded (outside the all-apps top-100 in these markets, or no App Store ID set)." />;
+  if (store === "android") return <StoreBlock label={null} pivot={android} emptyNote="No Google Play chart ranks recorded (outside the games top-200 in these markets, or no Play package set)." />;
+  return (
+    <div className="space-y-3">
+      <StoreBlock label="iOS — App Store (all-apps top-100)" pivot={ios}
+        emptyNote="No iOS chart ranks recorded (outside the all-apps top-100 in these markets, or no App Store ID set)." />
+      <StoreBlock label="Google Play (games top-200)" pivot={android}
+        emptyNote="No Google Play chart ranks recorded (outside the games top-200 in these markets, or no Play package set)." />
+    </div>
+  );
+}
+
+function StoreBlock({ label, pivot, emptyNote }: { label: string | null; pivot: Pivot; emptyNote: string }) {
+  return (
+    <div>
+      {label && <div className="mb-1 text-xs font-semibold text-[var(--text-secondary)]">{label}</div>}
+      {pivot.data.length === 0 ? (
+        <div className="flex h-24 items-center justify-center rounded border border-dashed border-[var(--grid)] text-xs text-[var(--text-muted)]">
+          {emptyNote}
+        </div>
+      ) : (
+        <>
+          <RankLinesChart data={pivot.data} seriesKeys={pivot.keys} colorFor={(k) => countryColor(k)} height={220} />
+          <CountryLegendNote keys={pivot.keys} />
+        </>
+      )}
+    </div>
   );
 }
 

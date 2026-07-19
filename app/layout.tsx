@@ -26,13 +26,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--page)]/95 backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center gap-1 overflow-x-auto px-3 py-2">
             <Link href="/" className="mr-3 shrink-0 text-sm font-bold tracking-tight">
-              📊 GameTracker
+              GameTracker
             </Link>
             {NAV.map((n) => (
               <Link
                 key={n.href}
                 href={n.href}
-                className="shrink-0 rounded px-2.5 py-1 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-white"
+                className="shrink-0 rounded px-2.5 py-1 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]"
               >
                 {n.label}
               </Link>

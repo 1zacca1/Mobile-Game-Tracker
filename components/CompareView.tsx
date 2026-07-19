@@ -109,8 +109,12 @@ export function CompareView({ games }: { games: Game[] }) {
             const on = selected.includes(g.id);
             return (
               <button key={g.id} onClick={() => toggle(g.id)}
-                className={`rounded-full border px-2.5 py-1 text-xs transition-colors ${on ? "border-transparent font-semibold text-white" : "border-[var(--border)] text-[var(--text-secondary)]"}`}
-                style={on ? { background: colorById.get(g.id) } : undefined}>
+                className={`rounded-full border-2 px-2.5 py-1 text-xs transition-colors ${on ? "font-semibold text-[var(--text-primary)]" : "border-[var(--border)] text-[var(--text-secondary)]"}`}
+                style={on ? { borderColor: colorById.get(g.id), background: "var(--surface-2)" } : undefined}>
+                {on && (
+                  <span className="mr-1.5 inline-block h-2 w-2 rounded-full align-middle"
+                    style={{ background: colorById.get(g.id) }} />
+                )}
                 {g.name}
               </button>
             );
