@@ -120,7 +120,7 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
 
       <ChartCard
         title="Top-grossing rank by country"
-        note="REAL store data. Inverted axis: up = better. iOS = all-apps top-100 (Apple RSS); Android = games top-200. Stores are shown separately — never merged."
+        note="REAL store data. Inverted axis: up = better. Games charts on both stores (iOS via the App Store charts endpoint, Android top-200). Stores are shown separately — never merged."
         csv={storeSplitCsv(store, grossingIos.data, grossingAndroid.data)}
         filename={`${game.name}_grossing.csv`}>
         <StoreSplitRanks store={store} ios={grossingIos} android={grossingAndroid} />
@@ -221,12 +221,12 @@ function storeSplitCsv(
 
 // "Both" renders two stacked charts — one per store — rather than merging ranks.
 function StoreSplitRanks({ store, ios, android }: { store: StoreFilter; ios: Pivot; android: Pivot }) {
-  if (store === "ios") return <StoreBlock label={null} pivot={ios} emptyNote="No iOS chart ranks recorded (outside the all-apps top-100 in these markets, or no App Store ID set)." />;
+  if (store === "ios") return <StoreBlock label={null} pivot={ios} emptyNote="No iOS chart ranks recorded (outside the games charts in these markets, or no App Store ID set)." />;
   if (store === "android") return <StoreBlock label={null} pivot={android} emptyNote="No Google Play chart ranks recorded (outside the games top-200 in these markets, or no Play package set)." />;
   return (
     <div className="space-y-3">
-      <StoreBlock label="iOS — App Store (all-apps top-100)" pivot={ios}
-        emptyNote="No iOS chart ranks recorded (outside the all-apps top-100 in these markets, or no App Store ID set)." />
+      <StoreBlock label="iOS — App Store (games top-200)" pivot={ios}
+        emptyNote="No iOS chart ranks recorded (outside the games charts in these markets, or no App Store ID set)." />
       <StoreBlock label="Google Play (games top-200)" pivot={android}
         emptyNote="No Google Play chart ranks recorded (outside the games top-200 in these markets, or no Play package set)." />
     </div>

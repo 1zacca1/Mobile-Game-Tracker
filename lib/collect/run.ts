@@ -38,16 +38,16 @@ async function collectCharts(games: Game[], date: string): Promise<{ wrote: numb
 
   for (const country of countries) {
     for (const chart of ["grossing", "free"] as const) {
-      // iOS — Apple RSS (top-100, all-apps chart)
+      // iOS — App Store charts endpoint (games top-200), RSS fallback for free
       try {
-        const ranks = await fetchAppleChart(country, chart);
+        const { ranks, source } = await fetchAppleChart(country, chart);
         for (const g of games) {
           if (!g.appstore_id || !g.markets.includes(country)) continue;
           const rank = ranks.get(g.appstore_id);
           if (rank != null) {
             await db`insert into rank_snapshots (game_id, date, store, country, chart, rank, source)
-              values (${g.id}, ${date}, 'ios', ${country}, ${chart}, ${rank}, 'apple_rss')
-              on conflict (game_id, date, store, country, chart) do update set rank = excluded.rank`;
+              values (${g.id}, ${date}, 'ios', ${country}, ${chart}, ${rank}, ${source})
+              on conflict (game_id, date, store, country, chart) do update set rank = excluded.rank, source = excluded.source`;
             wrote++;
           }
         }
