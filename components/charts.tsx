@@ -29,6 +29,29 @@ const TOOLTIP_STYLE = {
 
 const AXIS = { fontSize: 11, fill: "var(--text-muted)" } as const;
 
+// Direct label at the last non-null point of a series, so lines can be mapped
+// to their entity without round-tripping through the legend. The surface-color
+// halo keeps it readable where lines cross.
+function makeEndLabel(text: string, color: string, lastIdx: number) {
+  const EndLabel = (props: { x?: number; y?: number; index?: number }) => {
+    if (props.index !== lastIdx || props.x == null || props.y == null) return <g />;
+    return (
+      <text x={props.x + 6} y={props.y} dy={3.5} fontSize={10} fontWeight={600}
+        fill={color} stroke="var(--surface-1)" strokeWidth={3} paintOrder="stroke">
+        {text}
+      </text>
+    );
+  };
+  return EndLabel;
+}
+
+function lastNonNullIndex(data: Record<string, string | number | null>[], key: string): number {
+  for (let i = data.length - 1; i >= 0; i--) {
+    if (data[i][key] != null) return i;
+  }
+  return -1;
+}
+
 export function Sparkline({ data }: { data: { date: string; rank: number }[] }) {
   if (data.length === 0) {
     return <div className="flex h-10 items-center text-xs text-[var(--text-muted)]">no rank data yet</div>;
@@ -47,19 +70,20 @@ export function Sparkline({ data }: { data: { date: string; rank: number }[] }) 
 
 // Multi-series rank chart, one line per key, inverted Y (up = better).
 export function RankLinesChart({
-  data, seriesKeys, colorFor, height = 260,
+  data, seriesKeys, colorFor, height = 260, endLabel,
 }: {
   data: Record<string, string | number | null>[];
   seriesKeys: string[];
   colorFor: (key: string, idx: number) => string;
   height?: number;
+  endLabel?: (key: string) => string;
 }) {
   if (data.length === 0) {
     return <Empty />;
   }
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+      <LineChart data={data} margin={{ top: 8, right: endLabel ? 36 : 8, bottom: 4, left: 0 }}>
         <CartesianGrid stroke="var(--grid)" vertical={false} />
         <XAxis dataKey="date" tick={AXIS} tickLine={false} axisLine={{ stroke: "var(--baseline)" }} minTickGap={40} />
         <YAxis reversed tick={AXIS} tickLine={false} axisLine={false} width={38} domain={[1, "dataMax"]} allowDataOverflow />
@@ -67,7 +91,8 @@ export function RankLinesChart({
         {seriesKeys.length > 1 && <Legend wrapperStyle={{ fontSize: 12 }} />}
         {seriesKeys.map((k, i) => (
           <Line key={k} type="monotone" dataKey={k} stroke={colorFor(k, i)} strokeWidth={2}
-            dot={false} connectNulls isAnimationActive={false} />
+            dot={false} connectNulls isAnimationActive={false}
+            label={endLabel ? makeEndLabel(endLabel(k), colorFor(k, i), lastNonNullIndex(data, k)) : undefined} />
         ))}
       </LineChart>
     </ResponsiveContainer>
@@ -108,17 +133,18 @@ export function RevenueBandChart({
 
 // Simple single/multi count chart (review velocity, ad creatives).
 export function CountChart({
-  data, seriesKeys, colorFor, height = 220,
+  data, seriesKeys, colorFor, height = 220, endLabel,
 }: {
   data: Record<string, string | number | null>[];
   seriesKeys: string[];
   colorFor: (key: string, idx: number) => string;
   height?: number;
+  endLabel?: (key: string) => string;
 }) {
   if (data.length === 0) return <Empty />;
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+      <LineChart data={data} margin={{ top: 8, right: endLabel ? 36 : 8, bottom: 4, left: 0 }}>
         <CartesianGrid stroke="var(--grid)" vertical={false} />
         <XAxis dataKey="date" tick={AXIS} tickLine={false} axisLine={{ stroke: "var(--baseline)" }} minTickGap={40} />
         <YAxis tick={AXIS} tickLine={false} axisLine={false} width={44} />
@@ -126,7 +152,8 @@ export function CountChart({
         {seriesKeys.length > 1 && <Legend wrapperStyle={{ fontSize: 12 }} />}
         {seriesKeys.map((k, i) => (
           <Line key={k} type="monotone" dataKey={k} stroke={colorFor(k, i)} strokeWidth={2}
-            dot={false} connectNulls isAnimationActive={false} />
+            dot={false} connectNulls isAnimationActive={false}
+            label={endLabel ? makeEndLabel(endLabel(k), colorFor(k, i), lastNonNullIndex(data, k)) : undefined} />
         ))}
       </LineChart>
     </ResponsiveContainer>

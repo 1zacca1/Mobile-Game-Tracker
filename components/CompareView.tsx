@@ -132,7 +132,8 @@ export function CompareView({ games }: { games: Game[] }) {
             Pick games above or use a preset.
           </div>
         ) : (
-          <RankLinesChart data={data} seriesKeys={keys} colorFor={colorForKey} height={320} />
+          <RankLinesChart data={data} seriesKeys={keys} colorFor={colorForKey} height={320}
+            endLabel={(k) => (k.length > 14 ? `${k.slice(0, 13)}…` : k)} />
         )}
         <p className="mt-2 text-[11px] text-[var(--text-muted)]">
           Best (lowest) grossing rank per day within the chosen store/market filter. Inverted axis: up = better.

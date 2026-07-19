@@ -138,7 +138,8 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
         title="Review velocity (Δ reviews/day) by country"
         note={`PROXY for downloads: day-over-day change in cumulative review/rating counts. ${store === "both" ? "iOS + Google Play summed per country (velocity is additive, unlike ranks)." : store === "ios" ? "iOS only (iTunes lookup)." : "Google Play only."} Needs at least two collection days to show anything.`}
         csv={velocity.data} filename={`${game.name}_review_velocity.csv`}>
-        <CountChart data={velocity.data} seriesKeys={velocity.keys} colorFor={(k) => countryColor(k)} />
+        <CountChart data={velocity.data} seriesKeys={velocity.keys} colorFor={(k) => countryColor(k)}
+          endLabel={(k) => k.toUpperCase()} />
         <CountryLegendNote keys={velocity.keys} />
       </ChartCard>
 
@@ -242,7 +243,8 @@ function StoreBlock({ label, pivot, emptyNote }: { label: string | null; pivot: 
         </div>
       ) : (
         <>
-          <RankLinesChart data={pivot.data} seriesKeys={pivot.keys} colorFor={(k) => countryColor(k)} height={220} />
+          <RankLinesChart data={pivot.data} seriesKeys={pivot.keys} colorFor={(k) => countryColor(k)}
+            height={220} endLabel={(k) => k.toUpperCase()} />
           <CountryLegendNote keys={pivot.keys} />
         </>
       )}
