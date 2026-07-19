@@ -86,7 +86,8 @@ export function RankLinesChart({
       <LineChart data={data} margin={{ top: 8, right: endLabel ? 36 : 8, bottom: 4, left: 0 }}>
         <CartesianGrid stroke="var(--grid)" vertical={false} />
         <XAxis dataKey="date" tick={AXIS} tickLine={false} axisLine={{ stroke: "var(--baseline)" }} minTickGap={40} />
-        <YAxis reversed tick={AXIS} tickLine={false} axisLine={false} width={38} domain={[1, "dataMax"]} allowDataOverflow />
+        <YAxis reversed tick={AXIS} tickLine={false} axisLine={false} width={44} domain={[1, "dataMax"]}
+          allowDataOverflow tickFormatter={(v: number) => `#${v}`} />
         <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "var(--text-secondary)" }} />
         {seriesKeys.length > 1 && <Legend wrapperStyle={{ fontSize: 12 }} />}
         {seriesKeys.map((k, i) => (
