@@ -1,31 +1,31 @@
 @import "tailwindcss";
 
-/* Dark-only finance dashboard. Palette = dataviz reference instance, dark
-   column (validated adjacent-pair CVD + contrast on #1a1a19). */
+/* Light finance dashboard. Palette = dataviz reference instance, light
+   column (validated adjacent-pair CVD + contrast on #fcfcfb). */
 :root {
-  color-scheme: dark;
-  --page: #0d0d0d;
-  --surface-1: #1a1a19;
-  --surface-2: #232322;
-  --text-primary: #ffffff;
-  --text-secondary: #c3c2b7;
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface-1: #fcfcfb;
+  --surface-2: #f0efec;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
   --text-muted: #898781;
-  --grid: #2c2c2a;
-  --baseline: #383835;
-  --border: rgba(255, 255, 255, 0.1);
-  /* categorical slots (dark) — fixed order, never cycled */
-  --s1: #3987e5;
+  --grid: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.1);
+  /* categorical slots (light) — fixed order, never cycled */
+  --s1: #2a78d6;
   --s2: #008300;
-  --s3: #d55181;
-  --s4: #c98500;
-  --s5: #199e70;
-  --s6: #d95926;
-  --s7: #9085e9;
-  --s8: #e66767;
-  /* status */
-  --good: #0ca30c;
+  --s3: #e87ba4;
+  --s4: #eda100;
+  --s5: #1baf7a;
+  --s6: #eb6834;
+  --s7: #4a3aa7;
+  --s8: #e34948;
+  /* status — text-safe steps for the light surface */
+  --good: #006300;
   --critical: #d03b3b;
-  --warning: #fab219;
+  --warning: #a16207;
 }
 
 html {
@@ -42,6 +42,7 @@ body {
   background: var(--surface-1);
   border: 1px solid var(--border);
   border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(11, 11, 11, 0.04);
 }
 
 .tabular {
@@ -49,8 +50,8 @@ body {
 }
 
 input, select, textarea {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--surface-1);
+  border: 1px solid var(--baseline);
   border-radius: 0.375rem;
   padding: 0.375rem 0.5rem;
   font-size: 0.85rem;
@@ -63,8 +64,8 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--surface-1);
+  border: 1px solid var(--baseline);
   border-radius: 0.375rem;
   padding: 0.375rem 0.75rem;
   font-size: 0.85rem;
@@ -74,7 +75,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn:hover {
-  border-color: var(--text-muted);
+  background: var(--surface-2);
 }
 
 .btn-primary {
@@ -84,5 +85,5 @@ input:focus, select:focus, textarea:focus {
 }
 
 .btn-primary:hover {
-  filter: brightness(1.1);
+  filter: brightness(1.08);
 }
