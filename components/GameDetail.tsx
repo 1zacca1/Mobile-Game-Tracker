@@ -96,7 +96,7 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
   }, [apps]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h1 className="text-lg font-bold">{game.name}</h1>
@@ -109,7 +109,7 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
           <div className="flex overflow-hidden rounded-md border border-[var(--border)]">
             {(["both", "ios", "android"] as const).map((s) => (
               <button key={s} onClick={() => setStore(s)}
-                className={`px-3 py-1 text-xs ${store === s ? "bg-[var(--s1)] font-semibold text-white" : "bg-[var(--surface-2)] text-[var(--text-secondary)]"}`}>
+                className={`px-3.5 py-1.5 text-xs ${store === s ? "bg-[var(--s1)] font-semibold text-white" : "bg-[var(--surface-2)] text-[var(--text-secondary)]"}`}>
                 {s === "both" ? "Both" : s === "ios" ? "iOS" : "Android"}
               </button>
             ))}
@@ -193,9 +193,9 @@ function ChartCard({ title, note, children, csv, filename }: {
   csv: Record<string, unknown>[]; filename: string;
 }) {
   return (
-    <section className="card p-3">
+    <section className="card p-4">
       <div className="mb-2 flex items-start justify-between gap-2">
-        <h2 className="text-sm font-semibold">{title}</h2>
+        <h2 className="text-sm font-semibold tracking-tight">{title}</h2>
         <CsvButton rows={csv} filename={filename.replace(/[^a-z0-9._-]+/gi, "_")} />
       </div>
       {children}

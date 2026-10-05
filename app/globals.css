@@ -4,27 +4,26 @@
    column (validated adjacent-pair CVD + contrast on #fcfcfb). */
 :root {
   color-scheme: light;
-  --page: #f9f9f7;
-  --surface-1: #fcfcfb;
-  --surface-2: #f0efec;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #898781;
-  --grid: #edece6;
-  --baseline: #c3c2b7;
-  --border: rgba(11, 11, 11, 0.1);
-  /* categorical slots (light) — fixed order, never cycled */
-  --s1: #2a78d6;
-  --s2: #008300;
-  --s3: #e87ba4;
-  --s4: #eda100;
-  --s5: #1baf7a;
-  --s6: #eb6834;
-  --s7: #4a3aa7;
-  --s8: #e34948;
-  /* status — text-safe steps for the light surface */
-  --good: #006300;
-  --critical: #d03b3b;
+ --page: #f4f5f8;
+  --surface-1: #ffffff;
+  --surface-2: #eef0f5;
+  --text-primary: #12151f;
+  --text-secondary: #4b5262;
+  --text-muted: #8089a0;
+  --grid: #e8eaf0;
+  --baseline: #c9cedb;
+  --border: rgba(18, 21, 31, 0.09);
+  /* categorical slots — fixed order, never cycled */
+  --s1: #3b6fd8;
+  --s2: #e8833a;
+  --s3: #14a39a;
+  --s4: #c2478f;
+  --s5: #d9a21b;
+  --s6: #7c5cd6;
+  --s7: #5aa845;
+  --s8: #d9534f;
+  --good: #11803f;
+  --critical: #c93636;
   --warning: #a16207;
 }
 
@@ -35,14 +34,15 @@ html {
 body {
   background: var(--page);
   color: var(--text-primary);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 .card {
   background: var(--surface-1);
   border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(11, 11, 11, 0.04);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(18, 21, 31, 0.04), 0 4px 12px rgba(18, 21, 31, 0.03);
 }
 
 .tabular {
@@ -83,6 +83,9 @@ input:focus, select:focus, textarea:focus {
   border-color: var(--s1);
   color: #fff;
 }
+
+.card-hover { transition: border-color .15s, box-shadow .15s, transform .15s; }
+.card-hover:hover { border-color: var(--s1); box-shadow: 0 6px 18px rgba(59, 111, 216, 0.12); transform: translateY(-1px); }
 
 .btn-primary:hover {
   filter: brightness(1.08);

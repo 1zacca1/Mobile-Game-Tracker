@@ -44,7 +44,7 @@ interpolated values are ever stored.
      skipped (and logged as skipped), everything else still runs.
 4. **Redeploy** so env vars take effect.
 5. **Initialize.** Open `https://<your-app>.vercel.app/admin` → *Initialize
-   database* (creates tables, seeds 13 Century/Gravity titles with verified store
+   database* (creates tables, seeds 14 Century/Gravity titles with verified store
    IDs) → *Collect now (all)*. In 1–3 minutes the Overview fills with live ranks.
 6. **Cron** is preconfigured in `vercel.json`: `/api/collect` daily at 02:20 UTC
    (after both stores have rolled their daily charts). Hobby-plan compatible
@@ -143,3 +143,9 @@ unique per day) · `app_snapshots` (review counts, ratings, install brackets) ·
 `ad_snapshots` (active creative counts) · `anchors` (calibration points) ·
 `estimates_import` (third-party figures) · `collection_log`. Estimates and signals
 are never stored — always derived from snapshots at read time.
+
+## Monthly figures tab
+
+`/monthly` shows prior-month worldwide downloads and revenue per game (with MoM change, revenue/download and totals).
+Data comes from Admin → Import (once a month): CSV columns `game,date,metric,value,country,source`, metrics
+`downloads` / `revenue_usd`, date = first of the month, country `ww`. Re-importing a row replaces it.

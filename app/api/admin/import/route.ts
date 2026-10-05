@@ -5,7 +5,8 @@ import { checkAdminAuth } from "@/lib/auth";
 export const dynamic = "force-dynamic";
 
 // CSV import of third-party estimates (Sensor Tower, AppMagic exports, etc.).
-// Expected header: game_id,date,metric,value,country,source
+// Expected header: game_id (or game = exact game name),date,metric,value,country,source
+// Re-importing the same (game, date, metric, country, source) replaces the old row.
 // metric: e.g. revenue_usd | downloads. Rows that fail to parse are reported
 // back, never silently coerced.
 export async function POST(req: NextRequest) {
@@ -17,18 +18,26 @@ export async function POST(req: NextRequest) {
 
   const header = lines[0].toLowerCase().split(",").map((h) => h.trim());
   const idx = (name: string) => header.indexOf(name);
-  for (const col of ["game_id", "date", "metric", "value", "source"]) {
+  if (idx("game_id") === -1 && idx("game") === -1) {
+    return NextResponse.json({ error: "missing column: game_id (or game)" }, { status: 400 });
+  }
+  for (const col of ["date", "metric", "value", "source"]) {
     if (idx(col) === -1) {
       return NextResponse.json({ error: `missing column: ${col}` }, { status: 400 });
     }
   }
 
   const db = sql();
+  const nameToId = new Map<string, number>(
+    (await db`select id, name from games`).map((g) => [String(g.name).toLowerCase(), Number(g.id)]),
+  );
   let inserted = 0;
   const errors: string[] = [];
   for (let i = 1; i < lines.length; i++) {
     const cells = lines[i].split(",").map((c) => c.trim());
-    const gameId = Number(cells[idx("game_id")]);
+    const gameId = idx("game_id") >= 0
+      ? Number(cells[idx("game_id")])
+      : nameToId.get((cells[idx("game")] ?? "").toLowerCase()) ?? 0;
     const date = cells[idx("date")];
     const metric = cells[idx("metric")];
     const value = Number(cells[idx("value")]);
@@ -39,6 +48,8 @@ export async function POST(req: NextRequest) {
       continue;
     }
     try {
+      await db`delete from estimates_import
+        where game_id = ${gameId} and date = ${date} and metric = ${metric} and country = ${country} and source = ${source}`;
       await db`insert into estimates_import (game_id, date, metric, value, country, source)
         values (${gameId}, ${date}, ${metric}, ${value}, ${country}, ${source})`;
       inserted++;
