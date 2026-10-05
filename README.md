@@ -44,7 +44,7 @@ interpolated values are ever stored.
      skipped (and logged as skipped), everything else still runs.
 4. **Redeploy** so env vars take effect.
 5. **Initialize.** Open `https://<your-app>.vercel.app/admin` → *Initialize
-   database* (creates tables, seeds 13 Century/Gravity titles with verified store
+   database* (creates tables, seeds 14 Century/Gravity titles with verified store
    IDs) → *Collect now (all)*. In 1–3 minutes the Overview fills with live ranks.
 6. **Cron** is preconfigured in `vercel.json`: `/api/collect` daily at 02:20 UTC
    (after both stores have rolled their daily charts). Hobby-plan compatible

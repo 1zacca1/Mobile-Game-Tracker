@@ -16,6 +16,7 @@ export const SEED_GAMES: SeedGame[] = [
   { name: "Whiteout Survival", company: "Century Games", appstore_id: "6443575749", play_id: "com.gof.global", meta_search: "Whiteout Survival", markets: ["us", "kr", "tw", "th", "ph", "id", "jp"] },
   { name: "Kingshot", company: "Century Games", appstore_id: "6739554056", play_id: "com.run.tower.defense", meta_search: "Kingshot", markets: ["us", "kr", "tw", "th", "ph", "id", "jp"] },
   { name: "Frozen City", company: "Century Games", appstore_id: "1637040599", play_id: "com.fct.global", meta_search: "Frozen City", markets: ["us", "kr", "tw", "jp"] },
+  { name: "Tasty Travels: Merge Game", company: "Century Games", appstore_id: "6471045672", play_id: "com.fatmerge.global", meta_search: "Tasty Travels Merge Game", markets: ["us", "kr", "tw", "th", "ph", "id", "jp"] },
   // ---- Gravity (GRVY earnings read-through) ----
   { name: "Ragnarok Origin (NA)", company: "Gravity", appstore_id: "6459411007", play_id: "com.gravity.roo.lna", meta_search: "Ragnarok Origin", markets: ["us"] },
   { name: "Ragnarok Origin Global (SEA)", company: "Gravity", appstore_id: "1661507061", play_id: "com.gravity.roo.sea", meta_search: "Ragnarok Origin Global", markets: ["th", "ph", "id", "tw"] },

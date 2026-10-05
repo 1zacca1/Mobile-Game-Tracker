@@ -2,7 +2,7 @@
 
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, Legend,
-  ResponsiveContainer, ComposedChart, Area,
+  ResponsiveContainer, ComposedChart, Area, CartesianGrid,
 } from "recharts";
 
 // Fixed country -> categorical slot. Color follows the entity: a country keeps
@@ -20,9 +20,11 @@ export const SLOTS = [
 ];
 
 const TOOLTIP_STYLE = {
-  backgroundColor: "var(--surface-2)",
+  backgroundColor: "var(--surface-1)",
   border: "1px solid var(--border)",
-  borderRadius: 6,
+  borderRadius: 8,
+  boxShadow: "0 6px 20px rgba(18, 21, 31, 0.12)",
+  padding: "8px 10px",
   fontSize: 12,
   color: "var(--text-primary)",
 } as const;
@@ -54,10 +56,10 @@ function lastNonNullIndex(data: Record<string, string | number | null>[], key: s
 
 export function Sparkline({ data }: { data: { date: string; rank: number }[] }) {
   if (data.length === 0) {
-    return <div className="flex h-10 items-center text-xs text-[var(--text-muted)]">no rank data yet</div>;
+    return <div className="flex h-12 items-center text-xs text-[var(--text-muted)]">no rank data yet</div>;
   }
   return (
-    <ResponsiveContainer width="100%" height={40}>
+    <ResponsiveContainer width="100%" height={48}>
       <LineChart data={data} margin={{ top: 4, right: 2, bottom: 2, left: 2 }}>
         {/* inverted: better rank (lower number) plots higher */}
         <YAxis reversed hide domain={["dataMin", "dataMax"]} />
@@ -84,14 +86,15 @@ export function RankLinesChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data} margin={{ top: 8, right: endLabel ? 36 : 8, bottom: 4, left: 0 }}>
+        <CartesianGrid vertical={false} stroke="var(--grid)" />
         <XAxis dataKey="date" tick={AXIS} tickLine={false} axisLine={{ stroke: "var(--baseline)" }} minTickGap={40} />
-        {/* ranks live in the hover tooltip; no axis numbers, no gridlines */}
-        <YAxis reversed hide domain={[1, "dataMax"]} allowDataOverflow />
-        <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "var(--text-secondary)" }} />
-        {seriesKeys.length > 1 && <Legend wrapperStyle={{ fontSize: 12 }} />}
+        <YAxis reversed domain={[1, "dataMax"]} allowDataOverflow tick={AXIS} tickLine={false} axisLine={false}
+          width={40} tickFormatter={(v: number) => `#${v}`} />
+        <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "var(--text-secondary)", marginBottom: 4 }} cursor={{ stroke: "var(--baseline)" }} />
+        {seriesKeys.length > 1 && <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 6 }} />}
         {seriesKeys.map((k, i) => (
-          <Line key={k} type="monotone" dataKey={k} stroke={colorFor(k, i)} strokeWidth={2}
-            dot={false} connectNulls isAnimationActive={false}
+          <Line key={k} type="monotone" dataKey={k} stroke={colorFor(k, i)} strokeWidth={2.25}
+            dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--surface-1)" }} connectNulls isAnimationActive={false}
             label={endLabel ? makeEndLabel(endLabel(k), colorFor(k, i), lastNonNullIndex(data, k)) : undefined} />
         ))}
       </LineChart>
@@ -111,6 +114,7 @@ export function RevenueBandChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+        <CartesianGrid vertical={false} stroke="var(--grid)" />
         <XAxis dataKey="date" tick={AXIS} tickLine={false} axisLine={{ stroke: "var(--baseline)" }} minTickGap={40} />
         <YAxis tick={AXIS} tickLine={false} axisLine={false} width={52}
           tickFormatter={(v: number) => (v >= 1000 ? `$${Math.round(v / 1000)}k` : `$${v}`)} />
@@ -123,7 +127,7 @@ export function RevenueBandChart({
               : [`$${Number(value).toLocaleString()}`, "midpoint"]
           }
         />
-        <Area dataKey="band" stroke="none" fill="var(--s1)" fillOpacity={0.18} isAnimationActive={false} />
+        <Area dataKey="band" stroke="none" fill="var(--s1)" fillOpacity={0.14} isAnimationActive={false} />
         <Line type="monotone" dataKey="mid" stroke="var(--s1)" strokeWidth={2} dot={false} isAnimationActive={false} />
       </ComposedChart>
     </ResponsiveContainer>
@@ -144,13 +148,14 @@ export function CountChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <LineChart data={data} margin={{ top: 8, right: endLabel ? 36 : 8, bottom: 4, left: 0 }}>
+        <CartesianGrid vertical={false} stroke="var(--grid)" />
         <XAxis dataKey="date" tick={AXIS} tickLine={false} axisLine={{ stroke: "var(--baseline)" }} minTickGap={40} />
         <YAxis tick={AXIS} tickLine={false} axisLine={false} width={44} />
-        <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "var(--text-secondary)" }} />
-        {seriesKeys.length > 1 && <Legend wrapperStyle={{ fontSize: 12 }} />}
+        <Tooltip contentStyle={TOOLTIP_STYLE} labelStyle={{ color: "var(--text-secondary)", marginBottom: 4 }} cursor={{ stroke: "var(--baseline)" }} />
+        {seriesKeys.length > 1 && <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 6 }} />}
         {seriesKeys.map((k, i) => (
-          <Line key={k} type="monotone" dataKey={k} stroke={colorFor(k, i)} strokeWidth={2}
-            dot={false} connectNulls isAnimationActive={false}
+          <Line key={k} type="monotone" dataKey={k} stroke={colorFor(k, i)} strokeWidth={2.25}
+            dot={false} activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--surface-1)" }} connectNulls isAnimationActive={false}
             label={endLabel ? makeEndLabel(endLabel(k), colorFor(k, i), lastNonNullIndex(data, k)) : undefined} />
         ))}
       </LineChart>

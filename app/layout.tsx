@@ -23,24 +23,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-screen">
-        <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--page)]/95 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center gap-1 overflow-x-auto px-3 py-2">
-            <Link href="/" className="mr-3 shrink-0 text-sm font-bold tracking-tight">
+        <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--surface-1)]/90 backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center gap-1 overflow-x-auto px-4 py-2.5">
+            <Link href="/" className="mr-4 flex shrink-0 items-center gap-2 text-sm font-bold tracking-tight">
+              <span className="inline-block h-5 w-5 rounded-md bg-[var(--s1)]" />
               GameTracker
             </Link>
             {NAV.map((n) => (
               <Link
                 key={n.href}
                 href={n.href}
-                className="shrink-0 rounded px-2.5 py-1 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]"
+                className="shrink-0 rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]"
               >
                 {n.label}
               </Link>
             ))}
           </div>
         </header>
-        <main className="mx-auto max-w-6xl px-3 py-4">{children}</main>
-        <footer className="mx-auto max-w-6xl px-3 pb-6 text-xs text-[var(--text-muted)]">
+        <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+        <footer className="mx-auto max-w-6xl px-4 pb-8 text-xs text-[var(--text-muted)]">
           <div>
             Ranks are real store data · revenue figures are modeled estimates (labeled) · ad counts are EU
             Ad Library proxies

@@ -8,7 +8,7 @@ export function GameCard({ row }: { row: OverviewRow }) {
     bestGrossingNow != null && bestGrossingWeekAgo != null ? bestGrossingWeekAgo - bestGrossingNow : null;
 
   return (
-    <Link href={`/games/${game.id}`} className="card block p-3 transition-colors hover:border-[var(--text-muted)]">
+    <Link href={`/games/${game.id}`} className="card card-hover block p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="truncate text-sm font-semibold">{game.name}</div>
