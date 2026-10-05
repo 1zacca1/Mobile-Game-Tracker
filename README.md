@@ -39,7 +39,10 @@ interpolated values are ever stored.
    - `CRON_SECRET` — `openssl rand -hex 32`. Vercel Cron automatically sends it as
      `Authorization: Bearer …` to `/api/collect`, which rejects anything else.
    - `ADMIN_TOKEN` — any string; required for admin mutations once set. Enter it
-     once in the Admin page (stored in your browser's localStorage).
+     once in the Admin page (stored in your browser's localStorage). Marking it
+     *Sensitive* in Vercel hides the value afterwards; to rotate a lost token, edit
+     the variable, set a new value, and redeploy. Env var changes only apply to
+     deployments built after the change.
    - `META_AD_LIBRARY_TOKEN` — optional, see below. Without it the meta job is
      skipped (and logged as skipped), everything else still runs.
 4. **Redeploy** so env vars take effect.
