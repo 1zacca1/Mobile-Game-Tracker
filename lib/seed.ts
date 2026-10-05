@@ -15,7 +15,6 @@ export const SEED_GAMES: SeedGame[] = [
   // ---- Century Games (read-through: Smadex / Entravision UA spend) ----
   { name: "Whiteout Survival", company: "Century Games", appstore_id: "6443575749", play_id: "com.gof.global", meta_search: "Whiteout Survival", markets: ["us", "kr", "tw", "th", "ph", "id", "jp"] },
   { name: "Kingshot", company: "Century Games", appstore_id: "6739554056", play_id: "com.run.tower.defense", meta_search: "Kingshot", markets: ["us", "kr", "tw", "th", "ph", "id", "jp"] },
-  { name: "Frozen City", company: "Century Games", appstore_id: "1637040599", play_id: "com.fct.global", meta_search: "Frozen City", markets: ["us", "kr", "tw", "jp"] },
   { name: "Tasty Travels: Merge Game", company: "Century Games", appstore_id: "6471045672", play_id: "com.fatmerge.global", meta_search: "Tasty Travels Merge Game", markets: ["us", "kr", "tw", "th", "ph", "id", "jp"] },
   // ---- Gravity (GRVY earnings read-through) ----
   { name: "Ragnarok Origin (NA)", company: "Gravity", appstore_id: "6459411007", play_id: "com.gravity.roo.lna", meta_search: "Ragnarok Origin", markets: ["us"] },
@@ -29,3 +28,7 @@ export const SEED_GAMES: SeedGame[] = [
   { name: "Ragnarok X: Next Generation (Global)", company: "Gravity", appstore_id: "6739808360", play_id: "global.thedream.and.rox", meta_search: "Ragnarok X Next Generation", markets: ["us", "kr", "jp"] },
   { name: "Ragnarok X (JP, GungHo)", company: "Gravity", appstore_id: null, play_id: "jp.gungho.rox", meta_search: null, markets: ["jp"] },
 ];
+
+// Games dropped from tracking. Setup/seed marks these inactive (history is kept,
+// they just disappear from the site) instead of deleting rows.
+export const RETIRED_GAMES: string[] = ["Frozen City"];

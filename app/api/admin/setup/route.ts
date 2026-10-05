@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { SCHEMA_SQL } from "@/lib/schema";
-import { SEED_GAMES } from "@/lib/seed";
+import { SEED_GAMES, RETIRED_GAMES } from "@/lib/seed";
 import { checkAdminAuth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
   // Insert any seed game not already tracked (matched by store ID), so new
   // seed entries also reach databases that were initialized earlier.
   let seeded = 0;
+  await db`update games set active = false where name = any(${RETIRED_GAMES}) and active`;
   for (const g of SEED_GAMES) {
     const dup = await db`select 1 from games
       where (${g.appstore_id}::text is not null and appstore_id = ${g.appstore_id})
