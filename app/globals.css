@@ -14,14 +14,14 @@
   --baseline: #c9cedb;
   --border: rgba(18, 21, 31, 0.09);
   /* categorical slots — fixed order, never cycled */
-  --s1: #3b6fd8;
-  --s2: #e8833a;
-  --s3: #14a39a;
-  --s4: #c2478f;
-  --s5: #d9a21b;
-  --s6: #7c5cd6;
-  --s7: #5aa845;
-  --s8: #d9534f;
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --s5: #e87ba4;
+  --s6: #008300;
+  --s7: #4a3aa7;
+  --s8: #e34948;
   --good: #11803f;
   --critical: #c93636;
   --warning: #a16207;
