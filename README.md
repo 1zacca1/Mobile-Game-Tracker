@@ -2,7 +2,7 @@
 
 Daily tracking dashboard for mobile-game performance, built as an equity-research
 read-through for **Entravision (EVC)** — Century Games (Whiteout Survival, Kingshot,
-Frozen City) is a major Smadex DSP customer, so their UA activity proxies Smadex
+Tasty Travels) is a major Smadex DSP customer, so their UA activity proxies Smadex
 revenue — and **Gravity (GRVY)**, whose earnings hinge on the Ragnarok mobile
 portfolio across US/KR/TW/TH/PH/ID/JP.
 
@@ -44,7 +44,7 @@ interpolated values are ever stored.
      skipped (and logged as skipped), everything else still runs.
 4. **Redeploy** so env vars take effect.
 5. **Initialize.** Open `https://<your-app>.vercel.app/admin` → *Initialize
-   database* (creates tables, seeds 14 Century/Gravity titles with verified store
+   database* (creates tables, seeds 13 Century/Gravity titles with verified store
    IDs) → *Collect now (all)*. In 1–3 minutes the Overview fills with live ranks.
 6. **Cron** is preconfigured in `vercel.json`: `/api/collect` daily at 02:20 UTC
    (after both stores have rolled their daily charts). Hobby-plan compatible
