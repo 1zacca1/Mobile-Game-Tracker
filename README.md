@@ -143,3 +143,9 @@ unique per day) · `app_snapshots` (review counts, ratings, install brackets) ·
 `ad_snapshots` (active creative counts) · `anchors` (calibration points) ·
 `estimates_import` (third-party figures) · `collection_log`. Estimates and signals
 are never stored — always derived from snapshots at read time.
+
+## Monthly figures tab
+
+`/monthly` shows prior-month worldwide downloads and revenue per game (with MoM change, revenue/download and totals).
+Data comes from Admin → Import (once a month): CSV columns `game,date,metric,value,country,source`, metrics
+`downloads` / `revenue_usd`, date = first of the month, country `ww`. Re-importing a row replaces it.
