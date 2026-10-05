@@ -29,6 +29,6 @@ export const SEED_GAMES: SeedGame[] = [
   { name: "Ragnarok X (JP, GungHo)", company: "Gravity", appstore_id: null, play_id: "jp.gungho.rox", meta_search: null, markets: ["jp"] },
 ];
 
-// Games dropped from tracking. Setup/seed marks these inactive (history is kept,
-// they just disappear from the site) instead of deleting rows.
+// Games dropped from tracking. Setup/seed deletes these rows (and, via cascade,
+// any snapshots) so they disappear from the site entirely.
 export const RETIRED_GAMES: string[] = ["Frozen City"];

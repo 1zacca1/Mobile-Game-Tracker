@@ -8,7 +8,7 @@ async function main() {
   if (!url) throw new Error("DATABASE_URL is not set");
   const db = neon(url);
   let seeded = 0;
-  await db`update games set active = false where name = any(${RETIRED_GAMES}) and active`;
+  await db`delete from games where name = any(${RETIRED_GAMES})`;
   for (const g of SEED_GAMES) {
     const dup = await db`select 1 from games
       where (${g.appstore_id}::text is not null and appstore_id = ${g.appstore_id})

@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   // Insert any seed game not already tracked (matched by store ID), so new
   // seed entries also reach databases that were initialized earlier.
   let seeded = 0;
-  await db`update games set active = false where name = any(${RETIRED_GAMES}) and active`;
+  await db`delete from games where name = any(${RETIRED_GAMES})`;
   for (const g of SEED_GAMES) {
     const dup = await db`select 1 from games
       where (${g.appstore_id}::text is not null and appstore_id = ${g.appstore_id})
