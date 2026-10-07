@@ -152,3 +152,5 @@ are never stored — always derived from snapshots at read time.
 `/monthly` shows prior-month worldwide downloads and revenue per game (with MoM change, revenue/download and totals).
 Data comes from Admin → Import (once a month): CSV columns `game,date,metric,value,country,source`, metrics
 `downloads` / `revenue_usd`, date = first of the month, country `ww`. Re-importing a row replaces it.
+Publisher-level totals (e.g. all of Century Games' apps) use a `company` column with `game` left blank; the tab
+shows them above the per-game table with MoM change and the share covered by the tracked games.

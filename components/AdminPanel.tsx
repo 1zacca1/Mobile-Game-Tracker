@@ -360,7 +360,7 @@ function ImportSection({ busy, onImport }: { busy: boolean; onImport: (text: str
     <section className="card space-y-2 p-3">
       <h2 className="text-sm font-semibold">Import third-party estimates (CSV)</h2>
       <p className="text-[11px] text-[var(--text-muted)]">
-        Header: <code>game_id,date,metric,value,country,source</code> (or use a <code>game</code> name column instead of game_id) ·
+        Header: <code>game_id,date,metric,value,country,source</code> (or a <code>game</code> name column; or a <code>company</code> column with game blank for publisher-level totals) ·
         metrics: revenue_usd, downloads · date as YYYY-MM-DD (monthly figures: use the 1st of the month, country ww). Re-importing a row replaces it.
         Rows appear on the game page and on the Monthly tab, labeled with their source.
       </p>
@@ -369,7 +369,7 @@ function ImportSection({ busy, onImport }: { busy: boolean; onImport: (text: str
           const file = e.target.files?.[0];
           if (file) file.text().then(setText);
         }} />
-      <textarea rows={5} className="w-full font-mono text-xs" placeholder={"game,date,metric,value,country,source\nKingshot,2026-09-01,revenue_usd,35000000,ww,Publisher page\nKingshot,2026-09-01,downloads,1500000,ww,Publisher page"} value={text} onChange={(e) => setText(e.target.value)} />
+      <textarea rows={5} className="w-full font-mono text-xs" placeholder={"company,game,date,metric,value,country,source\nCentury Games,,2026-09-01,revenue_usd,90000000,ww,Publisher page\n,Kingshot,2026-09-01,revenue_usd,35000000,ww,Publisher page\n,Kingshot,2026-09-01,downloads,1500000,ww,Publisher page"} value={text} onChange={(e) => setText(e.target.value)} />
       <button className="btn btn-primary" disabled={busy || !text.trim()} onClick={() => onImport(text)}>Import</button>
     </section>
   );
