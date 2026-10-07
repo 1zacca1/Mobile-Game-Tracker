@@ -74,6 +74,8 @@ export const SCHEMA_SQL = [
     source text not null,
     created_at timestamptz not null default now()
   )`,
+  // Publisher-level monthly figures are rows with game_id null + company set.
+  `alter table estimates_import add column if not exists company text`,
   `create table if not exists collection_log (
     id bigserial primary key,
     run_at timestamptz not null default now(),
