@@ -8,15 +8,21 @@ type Log = { id: number; run_at: string; job: string; status: string; detail: st
 type AnchorRow = { id: number; store: string; country: string; anchor_date: string; rank: number; daily_revenue_usd: string; note: string | null };
 
 export function AdminPanel() {
+  const [token, setToken] = useState("");
   const [games, setGames] = useState<Game[]>([]);
   const [anchors, setAnchors] = useState<AnchorRow[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // Auth is the browser's login prompt (HTTP Basic, enforced by middleware):
-  // same-origin fetches carry the credentials automatically.
-  const headers = useCallback((): Record<string, string> => ({}), []);
+  useEffect(() => {
+    setToken(localStorage.getItem("admin_token") ?? "");
+  }, []);
+
+  const headers = useCallback(
+    (): Record<string, string> => (token ? { "x-admin-token": token } : {}),
+    [token]
+  );
 
   const refresh = useCallback(async () => {
     try {
@@ -60,6 +66,16 @@ export function AdminPanel() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-2">
         <h1 className="mr-auto text-lg font-bold">Admin</h1>
+        <input
+          type="password"
+          placeholder="admin key (needed to make changes)"
+          value={token}
+          onChange={(e) => {
+            setToken(e.target.value);
+            localStorage.setItem("admin_token", e.target.value);
+          }}
+          className="w-60 text-xs"
+        />
       </div>
 
       {msg && <div className="card border-[var(--s1)] p-2 text-xs">{msg}</div>}

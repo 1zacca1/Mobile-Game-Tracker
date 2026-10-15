@@ -39,13 +39,14 @@ interpolated values are ever stored.
    - `CRON_SECRET` — `openssl rand -hex 32`. Vercel Cron automatically sends it as
      `Authorization: Bearer …` to `/api/collect`, which rejects anything else.
    - `ADMIN_TOKEN` — **required**; any long random string (`openssl rand -hex 24`).
-     It protects the whole Admin area: visiting `/admin` shows a browser login
-     prompt (any username, this value as the password), and every `/api/admin/*`
-     call needs it (HTTP Basic or an `x-admin-token` header). If it is unset,
-     admin is disabled in production — it never falls back to being open.
-     Marking it *Sensitive* in Vercel hides the value afterwards; to rotate it,
-     edit the variable, set a new value, and redeploy. Env var changes only apply
-     to deployments built after the change.
+     Anyone can view the site and the Admin page, but every change (add/edit/delete
+     games, import, collect, setup, calibration) needs this key, enforced on the
+     server: enter it once in the Admin page's key field (stored only in your
+     browser) or send it as an `x-admin-token` header. Calibration anchors, logs
+     and store search also need it. If unset, changes are refused in production —
+     it never falls back to being open. Marking it *Sensitive* in Vercel hides the
+     value afterwards; to rotate it, edit the variable, set a new value, and
+     redeploy (env changes only apply to later deployments).
    - `META_AD_LIBRARY_TOKEN` — optional, see below. Without it the meta job is
      skipped (and logged as skipped), everything else still runs.
 4. **Redeploy** so env vars take effect.

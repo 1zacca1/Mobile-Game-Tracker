@@ -20,10 +20,10 @@ function safeEqual(a: string, b: string): boolean {
 
 export type AdminAuth = "ok" | "unauthorized" | "unconfigured";
 
-// The whole Admin area (page + /api/admin/*) requires ADMIN_TOKEN, supplied as
-// either an HTTP Basic password (any username — what the browser prompt sends)
-// or an x-admin-token header (scripts/curl). Fails CLOSED: with no ADMIN_TOKEN
-// configured, production refuses everything; only `next dev` is open.
+// Changing anything via /api/admin/* requires ADMIN_TOKEN, sent as an
+// x-admin-token header (the Admin page does this from the key you enter) or an
+// HTTP Basic password (curl -u). Fails CLOSED: with no ADMIN_TOKEN configured,
+// production refuses every protected request; only `next dev` is open.
 export function adminAuthStatus(headers: Headers): AdminAuth {
   const token = process.env.ADMIN_TOKEN;
   if (!token) return process.env.NODE_ENV === "production" ? "unconfigured" : "ok";
@@ -51,10 +51,9 @@ export function adminDeniedResponse(status: AdminAuth): NextResponse {
       { status: 503 },
     );
   }
-  return new NextResponse("Authentication required", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="GameTracker admin", charset="UTF-8"' },
-  });
+  // JSON 401 with no WWW-Authenticate header: the page asks for the key in its
+  // own field instead of popping a browser login dialog.
+  return NextResponse.json({ error: "admin token required (x-admin-token header)" }, { status: 401 });
 }
 
 // Defense in depth: every admin mutation re-checks, even though middleware
