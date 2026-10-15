@@ -203,3 +203,20 @@ export async function getMonthlyFigures(): Promise<MonthlyRow[]> {
     source: String(r.source),
   }));
 }
+
+export type CompanyMonthlyRow = { company: string; month: string; metric: string; value: number; source: string };
+
+// Publisher-level monthly totals (game_id null), worldwide.
+export async function getCompanyMonthly(): Promise<CompanyMonthlyRow[]> {
+  const rows = await sql()`
+    select company, date, metric, value, source from estimates_import
+    where game_id is null and company is not null and country = 'ww' and metric in ('downloads', 'revenue_usd')
+    order by date`;
+  return rows.map((r) => ({
+    company: String(r.company),
+    month: dateText(r.date).slice(0, 7),
+    metric: String(r.metric),
+    value: Number(r.value),
+    source: String(r.source),
+  }));
+}
