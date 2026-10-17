@@ -27,11 +27,11 @@ export default async function OverviewPage() {
     );
   }
 
-  // Only show games with a current rank (grossing seen in the last 7 days, or
-  // free in the last 3). Games with none stay tracked and reappear on their own
-  // as soon as fresh data is collected for them.
+  // Only show games with a current rank AND at least two grossing data points in
+  // the last 30 days (a single point has no trend to show). Games failing this stay
+  // tracked and reappear on their own once enough fresh data is collected.
   const total = rows.length;
-  rows = rows.filter((r) => r.bestGrossingNow != null || r.latestFree != null);
+  rows = rows.filter((r) => (r.bestGrossingNow != null || r.latestFree != null) && r.spark.length >= 2);
   const companies = [...new Set(rows.map((r) => r.game.company))];
   return (
     <div className="space-y-6">
