@@ -68,13 +68,13 @@ export function AdminPanel() {
         <h1 className="mr-auto text-lg font-bold">Admin</h1>
         <input
           type="password"
-          placeholder="admin token (if set)"
+          placeholder="admin key (needed to make changes)"
           value={token}
           onChange={(e) => {
             setToken(e.target.value);
             localStorage.setItem("admin_token", e.target.value);
           }}
-          className="w-44 text-xs"
+          className="w-60 text-xs"
         />
       </div>
 
@@ -360,15 +360,16 @@ function ImportSection({ busy, onImport }: { busy: boolean; onImport: (text: str
     <section className="card space-y-2 p-3">
       <h2 className="text-sm font-semibold">Import third-party estimates (CSV)</h2>
       <p className="text-[11px] text-[var(--text-muted)]">
-        Header: <code>game_id,date,metric,value,country,source</code> · metric examples: revenue_usd, downloads ·
-        date as YYYY-MM-DD. Game IDs are in the table above. Imported rows are shown on the game page, labeled with their source.
+        Header: <code>game_id,date,metric,value,country,source</code> (or a <code>game</code> name column; or a <code>company</code> column with game blank for publisher-level totals) ·
+        metrics: revenue_usd, downloads · date as YYYY-MM-DD (monthly figures: use the 1st of the month, country ww). Re-importing a row replaces it.
+        Rows appear on the game page and on the Monthly tab, labeled with their source.
       </p>
       <input type="file" accept=".csv,text/csv" className="text-xs"
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) file.text().then(setText);
         }} />
-      <textarea rows={5} className="w-full font-mono text-xs" placeholder={"game_id,date,metric,value,country,source\n1,2026-06-30,revenue_usd,1200000,us,SensorTower press 2026-07"} value={text} onChange={(e) => setText(e.target.value)} />
+      <textarea rows={5} className="w-full font-mono text-xs" placeholder={"company,game,date,metric,value,country,source\nCentury Games,,2026-09-01,revenue_usd,90000000,ww,Publisher page\n,Kingshot,2026-09-01,revenue_usd,35000000,ww,Publisher page\n,Kingshot,2026-09-01,downloads,1500000,ww,Publisher page"} value={text} onChange={(e) => setText(e.target.value)} />
       <button className="btn btn-primary" disabled={busy || !text.trim()} onClick={() => onImport(text)}>Import</button>
     </section>
   );

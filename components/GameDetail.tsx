@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { RankLinesChart, RevenueBandChart, CountChart, CsvButton, countryColor } from "./charts";
+import { SmallMultiples, RevenueBandChart, CountChart, CsvButton, STORE_COLOR } from "./charts";
 import { countryName } from "@/lib/countries";
 import type { SeriesBundle } from "@/lib/bundle";
 
@@ -96,7 +96,7 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
   }, [apps]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h1 className="text-lg font-bold">{game.name}</h1>
@@ -109,7 +109,7 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
           <div className="flex overflow-hidden rounded-md border border-[var(--border)]">
             {(["both", "ios", "android"] as const).map((s) => (
               <button key={s} onClick={() => setStore(s)}
-                className={`px-3 py-1 text-xs ${store === s ? "bg-[var(--s1)] font-semibold text-white" : "bg-[var(--surface-2)] text-[var(--text-secondary)]"}`}>
+                className={`px-3.5 py-1.5 text-xs ${store === s ? "bg-[var(--s1)] font-semibold text-white" : "bg-[var(--surface-2)] text-[var(--text-secondary)]"}`}>
                 {s === "both" ? "Both" : s === "ios" ? "iOS" : "Android"}
               </button>
             ))}
@@ -138,9 +138,7 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
         title="Review velocity (Δ reviews/day) by country"
         note={`PROXY for downloads: day-over-day change in cumulative review/rating counts. ${store === "both" ? "iOS + Google Play summed per country (velocity is additive, unlike ranks)." : store === "ios" ? "iOS only (iTunes lookup)." : "Google Play only."} Needs at least two collection days to show anything.`}
         csv={velocity.data} filename={`${game.name}_review_velocity.csv`}>
-        <CountChart data={velocity.data} seriesKeys={velocity.keys} colorFor={(k) => countryColor(k)}
-          endLabel={(k) => k.toUpperCase()} />
-        <CountryLegendNote keys={velocity.keys} />
+        <SmallMultiples data={velocity.data} keys={velocity.keys} color="var(--s1)" kind="count" nameFor={countryName} />
       </ChartCard>
 
       <ChartCard
@@ -193,9 +191,9 @@ function ChartCard({ title, note, children, csv, filename }: {
   csv: Record<string, unknown>[]; filename: string;
 }) {
   return (
-    <section className="card p-3">
+    <section className="card p-4">
       <div className="mb-2 flex items-start justify-between gap-2">
-        <h2 className="text-sm font-semibold">{title}</h2>
+        <h2 className="text-sm font-semibold tracking-tight">{title}</h2>
         <CsvButton rows={csv} filename={filename.replace(/[^a-z0-9._-]+/gi, "_")} />
       </div>
       {children}
@@ -221,47 +219,29 @@ function storeSplitCsv(
 
 // "Both" renders two stacked charts — one per store — rather than merging ranks.
 function StoreSplitRanks({ store, ios, android }: { store: StoreFilter; ios: Pivot; android: Pivot }) {
-  if (store === "ios") return <StoreBlock label={null} pivot={ios} emptyNote="No iOS chart ranks recorded (outside the games charts in these markets, or no App Store ID set)." />;
-  if (store === "android") return <StoreBlock label={null} pivot={android} emptyNote="No Google Play chart ranks recorded (outside the games top-200 in these markets, or no Play package set)." />;
+  if (store === "ios") return <StoreBlock label={null} color={STORE_COLOR.ios} pivot={ios} emptyNote="No iOS chart ranks recorded (outside the games charts in these markets, or no App Store ID set)." />;
+  if (store === "android") return <StoreBlock label={null} color={STORE_COLOR.android} pivot={android} emptyNote="No Google Play chart ranks recorded (outside the games top-200 in these markets, or no Play package set)." />;
   return (
-    <div className="space-y-3">
-      <StoreBlock label="iOS — App Store (games top-200)" pivot={ios}
+    <div className="space-y-5">
+      <StoreBlock label="iOS — App Store (games top-200)" color={STORE_COLOR.ios} pivot={ios}
         emptyNote="No iOS chart ranks recorded (outside the games charts in these markets, or no App Store ID set)." />
-      <StoreBlock label="Google Play (games top-200)" pivot={android}
+      <StoreBlock label="Google Play (games top-200)" color={STORE_COLOR.android} pivot={android}
         emptyNote="No Google Play chart ranks recorded (outside the games top-200 in these markets, or no Play package set)." />
     </div>
   );
 }
 
-function StoreBlock({ label, pivot, emptyNote }: { label: string | null; pivot: Pivot; emptyNote: string }) {
+function StoreBlock({ label, color, pivot, emptyNote }: { label: string | null; color: string; pivot: Pivot; emptyNote: string }) {
   return (
     <div>
-      {label && <div className="mb-1 text-xs font-semibold text-[var(--text-secondary)]">{label}</div>}
+      {label && <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--text-secondary)]"><span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: color }} />{label}</div>}
       {pivot.data.length === 0 ? (
         <div className="flex h-24 items-center justify-center rounded border border-dashed border-[var(--grid)] text-xs text-[var(--text-muted)]">
           {emptyNote}
         </div>
       ) : (
-        <>
-          <RankLinesChart data={pivot.data} seriesKeys={pivot.keys} colorFor={(k) => countryColor(k)}
-            height={220} endLabel={(k) => k.toUpperCase()} />
-          <CountryLegendNote keys={pivot.keys} />
-        </>
+        <SmallMultiples data={pivot.data} keys={pivot.keys} color={color} kind="rank" nameFor={countryName} />
       )}
-    </div>
-  );
-}
-
-function CountryLegendNote({ keys }: { keys: string[] }) {
-  if (keys.length === 0) return null;
-  return (
-    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-[var(--text-secondary)]">
-      {keys.map((k) => (
-        <span key={k} className="inline-flex items-center gap-1">
-          <span className="inline-block h-2 w-2 rounded-full" style={{ background: countryColor(k) }} />
-          {countryName(k)}
-        </span>
-      ))}
     </div>
   );
 }

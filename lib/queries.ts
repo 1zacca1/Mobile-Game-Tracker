@@ -175,3 +175,48 @@ export async function getOverview(): Promise<OverviewRow[]> {
     };
   });
 }
+
+export type MonthlyRow = {
+  gameId: number;
+  name: string;
+  company: string;
+  month: string; // YYYY-MM
+  metric: string;
+  value: number;
+  source: string;
+};
+
+// Monthly third-party figures (downloads / revenue_usd, worldwide), keyed by month.
+export async function getMonthlyFigures(): Promise<MonthlyRow[]> {
+  const rows = await sql()`
+    select e.game_id, g.name, g.company, e.date, e.metric, e.value, e.source
+    from estimates_import e join games g on g.id = e.game_id
+    where e.metric in ('downloads', 'revenue_usd') and e.country = 'ww'
+    order by e.date`;
+  return rows.map((r) => ({
+    gameId: Number(r.game_id),
+    name: String(r.name),
+    company: String(r.company),
+    month: dateText(r.date).slice(0, 7),
+    metric: String(r.metric),
+    value: Number(r.value),
+    source: String(r.source),
+  }));
+}
+
+export type CompanyMonthlyRow = { company: string; month: string; metric: string; value: number; source: string };
+
+// Publisher-level monthly totals (game_id null), worldwide.
+export async function getCompanyMonthly(): Promise<CompanyMonthlyRow[]> {
+  const rows = await sql()`
+    select company, date, metric, value, source from estimates_import
+    where game_id is null and company is not null and country = 'ww' and metric in ('downloads', 'revenue_usd')
+    order by date`;
+  return rows.map((r) => ({
+    company: String(r.company),
+    month: dateText(r.date).slice(0, 7),
+    metric: String(r.metric),
+    value: Number(r.value),
+    source: String(r.source),
+  }));
+}

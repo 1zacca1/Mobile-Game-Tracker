@@ -2,7 +2,7 @@
 
 Daily tracking dashboard for mobile-game performance, built as an equity-research
 read-through for **Entravision (EVC)** — Century Games (Whiteout Survival, Kingshot,
-Frozen City) is a major Smadex DSP customer, so their UA activity proxies Smadex
+Tasty Travels) is a major Smadex DSP customer, so their UA activity proxies Smadex
 revenue — and **Gravity (GRVY)**, whose earnings hinge on the Ragnarok mobile
 portfolio across US/KR/TW/TH/PH/ID/JP.
 
@@ -38,8 +38,15 @@ interpolated values are ever stored.
 3. **Set env vars** (Project → Settings → Environment Variables):
    - `CRON_SECRET` — `openssl rand -hex 32`. Vercel Cron automatically sends it as
      `Authorization: Bearer …` to `/api/collect`, which rejects anything else.
-   - `ADMIN_TOKEN` — any string; required for admin mutations once set. Enter it
-     once in the Admin page (stored in your browser's localStorage).
+   - `ADMIN_TOKEN` — **required**; any long random string (`openssl rand -hex 24`).
+     Anyone can view the site and the Admin page, but every change (add/edit/delete
+     games, import, collect, setup, calibration) needs this key, enforced on the
+     server: enter it once in the Admin page's key field (stored only in your
+     browser) or send it as an `x-admin-token` header. Calibration anchors, logs
+     and store search also need it. If unset, changes are refused in production —
+     it never falls back to being open. Marking it *Sensitive* in Vercel hides the
+     value afterwards; to rotate it, edit the variable, set a new value, and
+     redeploy (env changes only apply to later deployments).
    - `META_AD_LIBRARY_TOKEN` — optional, see below. Without it the meta job is
      skipped (and logged as skipped), everything else still runs.
 4. **Redeploy** so env vars take effect.
@@ -143,3 +150,11 @@ unique per day) · `app_snapshots` (review counts, ratings, install brackets) ·
 `ad_snapshots` (active creative counts) · `anchors` (calibration points) ·
 `estimates_import` (third-party figures) · `collection_log`. Estimates and signals
 are never stored — always derived from snapshots at read time.
+
+## Monthly figures tab
+
+`/monthly` shows prior-month worldwide downloads and revenue per game (with MoM change, revenue/download and totals).
+Data comes from Admin → Import (once a month): CSV columns `game,date,metric,value,country,source`, metrics
+`downloads` / `revenue_usd`, date = first of the month, country `ww`. Re-importing a row replaces it.
+Publisher-level totals (e.g. all of Century Games' apps) use a `company` column with `game` left blank; the tab
+shows them above the per-game table with MoM change and the share covered by the tracked games.

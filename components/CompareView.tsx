@@ -84,7 +84,7 @@ export function CompareView({ games }: { games: Game[] }) {
 
   return (
     <div className="space-y-3">
-      <div className="card space-y-3 p-3">
+      <div className="card space-y-3 p-4">
         <div className="flex flex-wrap items-center gap-2">
           <button className="btn text-xs" onClick={() => preset("Century Games")}>All Century Games</button>
           <button className="btn text-xs" onClick={() => preset("Gravity")}>All Gravity</button>
@@ -122,7 +122,7 @@ export function CompareView({ games }: { games: Game[] }) {
         </div>
       </div>
 
-      <div className="card p-3">
+      <div className="card p-4">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="text-sm font-semibold">Top-grossing rank overlay {loading && <span className="text-xs text-[var(--text-muted)]">(loading…)</span>}</h2>
           <CsvButton rows={data} filename="compare_grossing.csv" />
