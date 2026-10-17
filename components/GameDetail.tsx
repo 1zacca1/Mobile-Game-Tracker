@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { SmallMultiples, RevenueBandChart, CountChart, CsvButton, STORE_COLOR } from "./charts";
+import { SmallMultiples, CsvButton, STORE_COLOR } from "./charts";
 import { countryName } from "@/lib/countries";
 import type { SeriesBundle } from "@/lib/bundle";
 
@@ -22,7 +22,7 @@ function pivotByCountry(
 
 export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
   const [store, setStore] = useState<StoreFilter>("both");
-  const { game, ranks, apps, ads, estimates, imports } = bundle;
+  const { game, ranks, apps, imports } = bundle;
 
   const storeMatch = (s: string) => store === "both" || s === store;
 
@@ -65,30 +65,6 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
     }
     return pivotByCountry(rows);
   }, [apps, store]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // revenue band: sum modeled low/mid/high across calibrated (store, country)
-  const revenue = useMemo(() => {
-    const byDate = new Map<string, { low: number; mid: number; high: number; n: number }>();
-    for (const e of estimates) {
-      if (!storeMatch(e.store)) continue;
-      const cur = byDate.get(e.date) ?? { low: 0, mid: 0, high: 0, n: 0 };
-      cur.low += e.est_low; cur.mid += e.est_mid; cur.high += e.est_high; cur.n++;
-      byDate.set(e.date, cur);
-    }
-    return [...byDate.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([date, v]) => ({ date, low: v.low, mid: v.mid, high: v.high, band: [v.low, v.high] as [number, number] }));
-  }, [estimates, store]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const calibratedForStore = useMemo(
-    () => [...new Set(estimates.filter((e) => storeMatch(e.store)).map((e) => `${e.store} ${e.country.toUpperCase()}`))],
-    [estimates, store] // eslint-disable-line react-hooks/exhaustive-deps
-  );
-
-  const adsData = useMemo(
-    () => ads.map((a) => ({ date: a.date, ads: a.active_ads })),
-    [ads]
-  );
 
   const installsLatest = useMemo(() => {
     const withInstalls = apps.filter((a) => a.installs_text);
@@ -139,24 +115,6 @@ export function GameDetail({ bundle }: { bundle: SeriesBundle }) {
         note={`PROXY for downloads: day-over-day change in cumulative review/rating counts. ${store === "both" ? "iOS + Google Play summed per country (velocity is additive, unlike ranks)." : store === "ios" ? "iOS only (iTunes lookup)." : "Google Play only."} Needs at least two collection days to show anything.`}
         csv={velocity.data} filename={`${game.name}_review_velocity.csv`}>
         <SmallMultiples data={velocity.data} keys={velocity.keys} color="var(--s1)" kind="count" nameFor={countryName} />
-      </ChartCard>
-
-      <ChartCard
-        title="Estimated daily revenue band (USD)"
-        note={
-          revenue.length
-            ? `MODELED — not reported figures. Power law rev = A·rank^(−B) fit to your anchor points per (store, country); shaded area = uncertainty band. Currently summed across: ${calibratedForStore.join(", ")}. Markets without anchors are excluded, never guessed. Calibrate in Admin.`
-            : "MODELED — needs calibration. No anchor points entered yet for this game's markets: add known rank↔revenue points (Sensor Tower press figures, company disclosures) in Admin → Calibration. Without anchors nothing is estimated — we don't invent dollars."
-        }
-        csv={revenue.map(({ band, ...r }) => r)} filename={`${game.name}_est_revenue.csv`}>
-        <RevenueBandChart data={revenue} />
-      </ChartCard>
-
-      <ChartCard
-        title="Active Meta ad creatives"
-        note="PROXY for UA spend, not dollars. Count of ACTIVE creatives in Meta's Ad Library matching this title — EU-reach ads only (DSA transparency window)."
-        csv={adsData} filename={`${game.name}_meta_ads.csv`}>
-        <CountChart data={adsData} seriesKeys={["ads"]} colorFor={() => "var(--s6)"} />
       </ChartCard>
 
       {imports.length > 0 && (
