@@ -25,16 +25,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
-        <footer className="mx-auto max-w-6xl px-4 pb-8 text-xs text-[var(--text-muted)]">
-          <div>
-            Ranks are real store data · revenue figures are modeled estimates (labeled) · ad counts are EU
-            Ad Library proxies
-          </div>
-          <div className="mt-1 opacity-70">
-            build {(process.env.VERCEL_GIT_COMMIT_SHA ?? "local").slice(0, 7)}
-            {process.env.VERCEL_GIT_COMMIT_REF ? ` · ${process.env.VERCEL_GIT_COMMIT_REF}` : ""}
-          </div>
-        </footer>
       </body>
     </html>
   );

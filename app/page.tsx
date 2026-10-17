@@ -27,11 +27,11 @@ export default async function OverviewPage() {
     );
   }
 
-  // Only show games that have any rank data (30d grossing history, or a current
-  // grossing/free rank). Games with none stay tracked and reappear on their own
-  // as soon as data is collected for them.
+  // Only show games with a current rank (grossing seen in the last 7 days, or
+  // free in the last 3). Games with none stay tracked and reappear on their own
+  // as soon as fresh data is collected for them.
   const total = rows.length;
-  rows = rows.filter((r) => r.spark.length > 0 || r.bestGrossingNow != null || r.latestFree != null);
+  rows = rows.filter((r) => r.bestGrossingNow != null || r.latestFree != null);
   const companies = [...new Set(rows.map((r) => r.game.company))];
   return (
     <div className="space-y-6">
@@ -52,7 +52,7 @@ export default async function OverviewPage() {
       ))}
       {rows.length === 0 && total > 0 && (
         <div className="card p-6 text-sm text-[var(--text-secondary)]">
-          No rank data has been collected yet — games appear here once their first charts are collected.
+          No games have a current rank yet — they appear here as soon as fresh chart data is collected.
         </div>
       )}
       {total === 0 && (
