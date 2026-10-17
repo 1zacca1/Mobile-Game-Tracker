@@ -93,6 +93,9 @@ export type OverviewRow = {
   spark: { date: string; rank: number }[]; // best grossing rank per day, 30d
 };
 
+// A game counts as "current" only if its latest grossing rank is at most this many days old.
+const FRESH_DAYS = 7;
+
 export async function getOverview(): Promise<OverviewRow[]> {
   const games = await getGames();
   const db = sql();
@@ -153,7 +156,10 @@ export async function getOverview(): Promise<OverviewRow[]> {
       (r) => r.game_id === game.id
     );
     const spark = mine.map((r) => ({ date: dateText(r.date), rank: Number(r.best) }));
-    const today = spark.length ? spark[spark.length - 1] : null;
+    // "Now" must be recent: a rank last seen weeks ago is not a current rank.
+    const last = spark.length ? spark[spark.length - 1] : null;
+    const stale = !last || Date.now() - new Date(last.date).getTime() > FRESH_DAYS * 86400000;
+    const today = stale ? null : last;
     const weekAgoTarget = today
       ? new Date(new Date(today.date).getTime() - 7 * 86400000).toISOString().slice(0, 10)
       : null;
