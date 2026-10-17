@@ -27,6 +27,11 @@ export default async function OverviewPage() {
     );
   }
 
+  // Only show games that have any rank data (30d grossing history, or a current
+  // grossing/free rank). Games with none stay tracked and reappear on their own
+  // as soon as data is collected for them.
+  const total = rows.length;
+  rows = rows.filter((r) => r.spark.length > 0 || r.bestGrossingNow != null || r.latestFree != null);
   const companies = [...new Set(rows.map((r) => r.game.company))];
   return (
     <div className="space-y-6">
@@ -45,7 +50,12 @@ export default async function OverviewPage() {
           </div>
         </section>
       ))}
-      {rows.length === 0 && (
+      {rows.length === 0 && total > 0 && (
+        <div className="card p-6 text-sm text-[var(--text-secondary)]">
+          No rank data has been collected yet — games appear here once their first charts are collected.
+        </div>
+      )}
+      {total === 0 && (
         <div className="card p-6 text-sm text-[var(--text-secondary)]">
           No games configured yet. Open <Link className="underline" href="/admin">Admin</Link> and press
           “Initialize database” to create tables and seed the default Century Games / Gravity set.
