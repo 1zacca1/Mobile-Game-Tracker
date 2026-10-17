@@ -12,14 +12,6 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const NAV = [
-  { href: "/", label: "Overview" },
-  { href: "/monthly", label: "Monthly" },
-  { href: "/compare", label: "Compare" },
-  { href: "/signals", label: "Signals" },
-  { href: "/admin", label: "Admin" },
-];
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -30,15 +22,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="inline-block h-5 w-5 rounded-md bg-[var(--s1)]" />
               GameTracker
             </Link>
-            {NAV.map((n) => (
-              <Link
-                key={n.href}
-                href={n.href}
-                className="shrink-0 rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-2)] hover:text-[var(--text-primary)]"
-              >
-                {n.label}
-              </Link>
-            ))}
           </div>
         </header>
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
