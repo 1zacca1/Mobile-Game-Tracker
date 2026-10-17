@@ -9,15 +9,54 @@ type AnchorRow = { id: number; store: string; country: string; anchor_date: stri
 
 export function AdminPanel() {
   const [token, setToken] = useState("");
+  const [draft, setDraft] = useState("");
+  // null = checking, false = locked (nothing below the key form is rendered)
+  const [authed, setAuthed] = useState<boolean | null>(null);
   const [games, setGames] = useState<Game[]>([]);
   const [anchors, setAnchors] = useState<AnchorRow[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    setToken(localStorage.getItem("admin_token") ?? "");
+  // The server is the only judge of the key: /api/admin/session answers 200 only
+  // with a valid key. Until it does, the games list and every control stay hidden.
+  const verify = useCallback(async (candidate: string): Promise<boolean> => {
+    try {
+      const res = await fetch("/api/admin/session", { headers: candidate ? { "x-admin-token": candidate } : {} });
+      return res.ok;
+    } catch {
+      return false;
+    }
   }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("admin_token") ?? "";
+    verify(saved).then((ok) => {
+      if (ok) setToken(saved);
+      else localStorage.removeItem("admin_token");
+      setAuthed(ok);
+    });
+  }, [verify]);
+
+  async function unlock() {
+    const ok = await verify(draft.trim());
+    if (ok) {
+      localStorage.setItem("admin_token", draft.trim());
+      setToken(draft.trim());
+      setMsg("");
+    } else {
+      setMsg("That key was not accepted.");
+    }
+    setAuthed(ok);
+    setDraft("");
+  }
+
+  function lock() {
+    localStorage.removeItem("admin_token");
+    setToken("");
+    setGames([]); setAnchors([]); setLogs([]);
+    setAuthed(false);
+  }
 
   const headers = useCallback(
     (): Record<string, string> => (token ? { "x-admin-token": token } : {}),
@@ -27,9 +66,9 @@ export function AdminPanel() {
   const refresh = useCallback(async () => {
     try {
       const [g, a, l] = await Promise.all([
-        fetch("/api/admin/games").then((r) => (r.ok ? r.json() : [])),
-        fetch("/api/admin/anchors").then((r) => (r.ok ? r.json() : [])),
-        fetch("/api/admin/logs").then((r) => (r.ok ? r.json() : [])),
+        fetch("/api/admin/games", { headers: headers() }).then((r) => (r.ok ? r.json() : [])),
+        fetch("/api/admin/anchors", { headers: headers() }).then((r) => (r.ok ? r.json() : [])),
+        fetch("/api/admin/logs", { headers: headers() }).then((r) => (r.ok ? r.json() : [])),
       ]);
       setGames(Array.isArray(g) ? g : []);
       setAnchors(Array.isArray(a) ? a : []);
@@ -37,11 +76,11 @@ export function AdminPanel() {
     } catch {
       setMsg("Could not load admin data — is the database initialized?");
     }
-  }, []);
+  }, [headers]);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (authed) refresh();
+  }, [authed, refresh]);
 
   async function call(path: string, init: RequestInit, okMsg: string) {
     setBusy(true);
@@ -49,7 +88,10 @@ export function AdminPanel() {
     try {
       const res = await fetch(path, { ...init, headers: { ...headers(), "content-type": init.body instanceof FormData ? undefined! : "application/json", ...(init.headers as Record<string, string>) } });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) {
+      if (res.status === 401 || res.status === 503) {
+        lock();
+        setMsg(`Locked: ${body.error ?? "admin key required"}`);
+      } else if (!res.ok) {
         setMsg(`Error: ${body.error ?? res.status}`);
       } else {
         setMsg(okMsg + (body.reports ? " " + summarizeReports(body.reports) : "") + (body.seeded != null ? ` (seeded ${body.seeded} games)` : "") + (body.inserted != null ? ` (${body.inserted} rows${body.errors?.length ? `, ${body.errors.length} skipped` : ""})` : ""));
@@ -62,20 +104,32 @@ export function AdminPanel() {
     }
   }
 
+  if (authed !== true) {
+    return (
+      <div className="mx-auto max-w-sm space-y-3 pt-8">
+        <h1 className="text-lg font-bold">Admin</h1>
+        {authed === null ? (
+          <p className="text-sm text-[var(--text-muted)]">Checking…</p>
+        ) : (
+          <form className="card space-y-3 p-4" onSubmit={(e) => { e.preventDefault(); unlock(); }}>
+            <p className="text-sm text-[var(--text-secondary)]">
+              This area is locked. Enter the admin key to manage games, imports and collection.
+            </p>
+            <input type="password" autoComplete="current-password" placeholder="admin key" value={draft}
+              onChange={(e) => setDraft(e.target.value)} className="w-full" />
+            <button className="btn btn-primary w-full" type="submit" disabled={!draft.trim()}>Unlock</button>
+            {msg && <p className="text-xs text-[var(--critical)]">{msg}</p>}
+          </form>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-2">
         <h1 className="mr-auto text-lg font-bold">Admin</h1>
-        <input
-          type="password"
-          placeholder="admin key (needed to make changes)"
-          value={token}
-          onChange={(e) => {
-            setToken(e.target.value);
-            localStorage.setItem("admin_token", e.target.value);
-          }}
-          className="w-60 text-xs"
-        />
+        <button className="btn text-xs" onClick={lock}>Lock</button>
       </div>
 
       {msg && <div className="card border-[var(--s1)] p-2 text-xs">{msg}</div>}
